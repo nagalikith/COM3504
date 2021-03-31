@@ -1,6 +1,6 @@
 let name = null;
 let roomNo = null;
-let socket=null;
+let chat= io.connect('/chat');
 
 
 /**
@@ -14,6 +14,7 @@ function init() {
     document.getElementById('chat_interface').style.display = 'none';
 
     //@todo here is where you should initialise the socket operations as described in teh lectures (room joining, chat message receipt etc.)
+    initChatSocket();
 }
 
 /**
@@ -26,13 +27,42 @@ function generateRoom() {
     document.getElementById('roomNo').value = 'R' + roomNo;
 }
 
+function initChatSocket() {
+    // called when someone joins the room. If it is someone else it notifies the joining of the room
+    chat.on('joined', function (room, userId) {
+        if (userId === name) {
+            // it enters the chat
+            hideLoginInterface(room, userId);
+        } else {
+            // notifies that someone has joined the room
+            writeOnChatHistory('<b>' + userId + '</b>' + ' joined room ' + room);
+        }
+    });
+    // called when a message is received
+    chat.on('chat', function (room, userId, chatText) {
+        let who = userId
+        if (userId === name) who = 'Me';
+        writeOnChatHistory('<b>' + who + ':</b> ' + chatText);
+    });
+
+}
+
+function writeOnChatHistory(text) {
+    let history = document.getElementById('chat_history');
+    let paragraph = document.createElement('p');
+    paragraph.innerHTML = text;
+    history.appendChild(paragraph);
+    document.getElementById('chat_input').value = '';
+}
+
+
 /**
  * called when the Send button is pressed. It gets the text to send from the interface
  * and sends the message via  socket
  */
 function sendChatText() {
     let chatText = document.getElementById('chat_input').value;
-    // @todo send the chat message
+    chat.emit('chat', roomNo, name, chatText);
 }
 
 /**
@@ -44,24 +74,20 @@ function connectToRoom() {
     name = document.getElementById('name').value;
     let imageUrl= document.getElementById('image_url').value;
     if (!name) name = 'Unknown-' + Math.random();
-    //@todo join the room
-    initCanvas(socket, imageUrl);
+    chat.emit('create or join', roomNo, name);}
+    initCanvas('chat', imageUrl);
     hideLoginInterface(roomNo, name);
-}
 
 /**
  * it appends the given html text to the history div
  * this is to be called when the socket receives the chat message (socket.on ('message'...)
  * @param text: the text to append
  */
-function writeOnHistory(text) {
-    if (text==='') return;
-    let history = document.getElementById('history');
+function writeOnChatHistory(text) {
+    let history = document.getElementById('chat_history');
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
     history.appendChild(paragraph);
-    // scroll to the last element
-    history.scrollTop = history.scrollHeight;
     document.getElementById('chat_input').value = '';
 }
 
