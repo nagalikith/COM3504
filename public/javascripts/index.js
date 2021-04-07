@@ -72,11 +72,13 @@ function sendChatText() {
 function connectToRoom() {
     roomNo = document.getElementById('roomNo').value;
     name = document.getElementById('name').value;
-    let imageUrl= document.getElementById('image_url').value;
+    let imageUrl = document.getElementById('image_url').value;
     if (!name) name = 'Unknown-' + Math.random();
-    chat.emit('create or join', roomNo, name);}
+    chat.emit('create or join', roomNo, name);
     initCanvas('chat', imageUrl);
     hideLoginInterface(roomNo, name);
+}
+
 
 /**
  * it appends the given html text to the history div
@@ -88,6 +90,7 @@ function writeOnChatHistory(text) {
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
     history.appendChild(paragraph);
+    history.scrollTop = history.scrollHeight;
     document.getElementById('chat_input').value = '';
 }
 
