@@ -1,6 +1,5 @@
 exports.init = function(io) {
 
-  // the chat namespace
   const chat = io
       .of('/chat')
       .on('connection', function (socket) {
@@ -20,6 +19,13 @@ exports.init = function(io) {
           socket.on('disconnect', function () {
             console.log('someone disconnected');
           });
+
+          socket.on('draw', function(room, userId, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness){
+              // console.log('X:' + currX + '  Y:' + currY);
+              socket.broadcast.emit('drawing', room, userId, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness);
+          });
+
+
         } catch (e) {
         }
       });

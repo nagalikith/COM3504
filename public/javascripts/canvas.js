@@ -5,6 +5,7 @@ let room;
 let userId;
 let color = 'red', thickness = 4;
 
+
 /**
  * it inits the image canvas to draw on. It sets up the events to respond to (click, mouse on, etc.)
  * it is also the place where the data should be sent  via socket.io
@@ -37,8 +38,8 @@ function initCanvas(sckt, imageUrl) {
         if (e.type === 'mousemove') {
             if (flag) {
                 drawOnCanvas(ctx, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness);
-                // @todo if you draw on the canvas, you may want to let everyone know via socket.io (socket.emit...)  by sending them
-                // room, userId, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness
+                // emiting what you are drawing on your own canvas
+                chat.emit('draw', room, userId, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness)
             }
         }
     });
@@ -52,11 +53,14 @@ function initCanvas(sckt, imageUrl) {
 
     });
 
-    // @todo here you want to capture the event on the socket when someone else is drawing on their canvas (socket.on...)
-    // I suggest that you receive userId, canvasWidth, canvasHeight, x1, y21, x2, y2, color, thickness
-    // and then you call
-    //     let ctx = canvas[0].getContext('2d');
-    //     drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y21, x2, y2, color, thickness)
+    /**
+     someoneelse is broadcasting that they are drawing on their canvas
+     */
+    chat.on('drawing', function(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness){
+        let ctx = canvas[0].getContext('2d');
+        console.log('X:' + x2 + '  Y:' + y2 + "color: " + color + " thinckness: " + thickness);
+        drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
+    });
 
     // this is called when the src of the image is loaded
     // this is an async operation as it may take time
@@ -102,8 +106,6 @@ function drawImageScaled(img, canvas, ctx) {
     let x = (canvas.width / 2) - (img.width / 2) * scale;
     let y = (canvas.height / 2) - (img.height / 2) * scale;
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-
-
 }
 
 
