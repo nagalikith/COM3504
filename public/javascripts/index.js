@@ -3,6 +3,15 @@ let roomNo = null;
 let chat= io.connect('/chat');
 
 
+function initChatWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('./service-worker.js')
+            .then(function() { console.log('Service Worker Registered'); });
+    }
+    loadData(false);
+}
+
 /**
  * called by <body onload>
  * it initialises the interface and the expected socket messages
