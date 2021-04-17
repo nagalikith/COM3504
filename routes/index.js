@@ -11,3 +11,18 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
+
+/**
+ *
+ * @param room_id
+ * @param image_url
+ * @param chat_history
+ * @constructor
+ */
+class UserChat{
+  constructor (room_id, image_url, chat_history) {
+    this.room_id= room_id;
+    this.image_url= image_url;
+    this.chat_history=chat_history;
+  }
+}
