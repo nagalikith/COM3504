@@ -59,6 +59,7 @@ function initCanvas(sckt, imageUrl) {
     chat.on('drawing', function(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness){
         let ctx = canvas[0].getContext('2d');
         console.log('X:' + x2 + '  Y:' + y2 + "color: " + color + " thinckness: " + thickness);
+        canvasData(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
         drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
     });
 

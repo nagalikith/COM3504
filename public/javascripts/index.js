@@ -43,6 +43,8 @@ function initChatSocket() {
         let who = userId
         if (userId === name) who = 'Me';
         writeOnChatHistory('<b>' + who + ':</b> ' + chatText);
+
+        //Write Code for storing chat history in indexdb
     });
 
 }
@@ -63,6 +65,9 @@ function writeOnChatHistory(text) {
 function sendChatText() {
     let chatText = document.getElementById('chat_input').value;
     chat.emit('chat', roomNo, name, chatText);
+
+    //Write Code to store Chat history in Database
+
 }
 
 /**
