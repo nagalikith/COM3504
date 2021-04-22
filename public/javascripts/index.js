@@ -12,6 +12,36 @@ function initChatWorker() {
     loadData(false);
 }
 
+function loadData(forceReload){
+    forceReload = true;
+}
+
+window.addEventListener('offline', function(e) {
+    // Queue up events for server.
+    console.log("You are offline");
+    showOfflineWarning();
+}, false);
+
+/**
+ * When the client gets online, it hides the off line warning
+ */
+window.addEventListener('online', function(e) {
+    // Resync data with server.
+    console.log("You are online");
+    hideOfflineWarning();
+    loadData(false);
+}, false);
+
+function showOfflineWarning(){
+    if (document.getElementById('offline_div')!=null)
+        document.getElementById('offline_div').style.display='block';
+}
+
+function hideOfflineWarning(){
+    if (document.getElementById('offline_div')!=null)
+        document.getElementById('offline_div').style.display='none';
+}
+
 /**
  * called by <body onload>
  * it initialises the interface and the expected socket messages
