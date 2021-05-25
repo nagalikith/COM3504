@@ -16,6 +16,7 @@ function canvasData (room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, co
 }
 
 
+
 /**
  * it sends an Ajax query using JQuery
  * @param url the url to send to
@@ -35,7 +36,14 @@ function sendAjaxQuery(url, data) {
             // in order to have the object printed by alert
             // we need to JSON.stringify the object
             let room_id = dataR.roomNo + dataR.image_url;
-            getCachedData(room_id);
+            var loadData = getCachedData(room_id).then(function (result){
+                loadData = result[0].chat;
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(loadData, 'text/html');
+                let history = document.getElementById('chat_history');
+                history.append(doc.body);
+            });
+
         },
         error: function (response) {
             // the error structure we passed is in the field responseText
