@@ -16,7 +16,6 @@ function canvasData (room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, co
 }
 
 
-
 /**
  * it sends an Ajax query using JQuery
  * @param url the url to send to
@@ -35,7 +34,8 @@ function sendAjaxQuery(url, data) {
             // object for us before returning it
             // in order to have the object printed by alert
             // we need to JSON.stringify the object
-            alert(JSON.stringify(dataR));
+            let room_id = dataR.roomNo + dataR.image_url;
+            getCachedData(room_id);
         },
         error: function (response) {
             // the error structure we passed is in the field responseText
@@ -56,11 +56,10 @@ function onSubmit() {
     // The .serializeArray() method creates a JavaScript array of objects
     // https://api.jquery.com/serializearray/
     const formArray= $("form").serializeArray();
-    const data={};
-    for (let index in formArray){
+    var data={};
+    for (index in formArray){
         data[formArray[index].name]= formArray[index].value;
     }
-    console.log("DATA   "+data);
     // const data = JSON.stringify($(this).serializeArray());
     sendAjaxQuery('/', data);
     // prevent the form from reloading the page (normal behaviour for forms)

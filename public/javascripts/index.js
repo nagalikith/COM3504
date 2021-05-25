@@ -44,7 +44,10 @@ function initChatSocket() {
         if (userId === name) who = 'Me';
         writeOnChatHistory('<b>' + who + ':</b> ' + chatText);
 
-        //Write Code for storing chat history in indexdb
+        let room_id = {"room_no": document.getElementById('roomNo').value +
+                document.getElementById('image_url').value};
+        let chat_history = {"chat": document.getElementById('chat_history').innerHTML}
+        storeCachedChatData(room_id, chat_history).then(r => console.log('Added to database'));
     });
 
 }
@@ -67,7 +70,10 @@ function sendChatText() {
     chat.emit('chat', roomNo, name, chatText);
 
     //Write Code to store Chat history in Database
-
+    let room_id = {"room_no": document.getElementById('roomNo').value +
+            document.getElementById('image_url').value};
+    let chat_history = {"Name": name,"chat": chatText}
+    storeCachedChatData(room_id, chat_history).then(r => console.log('Added to database'));
 }
 
 /**

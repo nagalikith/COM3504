@@ -14,18 +14,18 @@ const USERCHAT_STORE_NAME_2 = 'store_chatannotations';
 async function initDatabase(){
     if (!db) {
         db = await idb.openDB(USERCHAT_DB_NAME, 2, {
-            upgrade(upgradeDb, oldVersion, newVersion) {
+            upgrade: function (upgradeDb, oldVersion, newVersion) {
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME)) {
-                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME, {
-                        keyPath: 'room_id'
+                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME,{
+                        keyPath:'id', autoIncrement: true
                     });
+                    userdataDB.createIndex('room_id', 'room_id')
                 }
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME_2)) {
-                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME_2, {
-                        keyPath: 'room_id'
-                    });
+                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME_2);
+                    userdataDB.createIndex('room_id', 'room_id')
                 }
 
             }
@@ -37,14 +37,17 @@ window.initDatabase= initDatabase;
 
 
 async function storeCachedChatData(room_id, chatHistory) {
-    console.log('inserting: '+JSON.stringify(chatHistory));
+    console.log('inserting: '+chatHistory);
     if (!db)
         await initDatabase();
     if (db) {
         try{
             let tx = await db.transaction(USERCHAT_STORE_NAME, 'readwrite');
             let store = await tx.objectStore(USERCHAT_STORE_NAME);
-            await store.put(chatHistory);
+            await tx.store.add({
+                room_id: room_id.room_no,
+                chatHistory: chatHistory
+            });
             await  tx.done;
             console.log('added item to the store! '+ JSON.stringify(chatHistory));
         } catch(error) {
