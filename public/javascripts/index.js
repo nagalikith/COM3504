@@ -44,21 +44,11 @@ function initChatSocket() {
         if (userId === name) who = 'Me';
         writeOnChatHistory('<b>' + who + ':</b> ' + chatText);
 
-        let room_id = {"room_no": document.getElementById('roomNo').value +
-                document.getElementById('image_url').value};
-        let chat_history = {"chat": document.getElementById('chat_history').innerHTML}
-        storeCachedChatData(room_id, chat_history).then(r => console.log('Added to database'));
+
     });
 
 }
 
-function writeOnChatHistory(text) {
-    let history = document.getElementById('chat_history');
-    let paragraph = document.createElement('p');
-    paragraph.innerHTML = text;
-    history.appendChild(paragraph);
-    document.getElementById('chat_input').value = '';
-}
 
 
 /**
@@ -68,12 +58,6 @@ function writeOnChatHistory(text) {
 function sendChatText() {
     let chatText = document.getElementById('chat_input').value;
     chat.emit('chat', roomNo, name, chatText);
-
-    //Write Code to store Chat history in Database
-    let room_id = {"room_no": document.getElementById('roomNo').value +
-            document.getElementById('image_url').value};
-    let chat_history = {"Name": name,"chat": chatText}
-    storeCachedChatData(room_id, chat_history).then(r => console.log('Added to database'));
 }
 
 /**
@@ -103,6 +87,12 @@ function writeOnChatHistory(text) {
     history.appendChild(paragraph);
     history.scrollTop = history.scrollHeight;
     document.getElementById('chat_input').value = '';
+    document.getElementById('chat_input').value = '';
+    let userChat = {room_id: document.getElementById('roomNo').value +
+            document.getElementById('image_url').value,
+        chat: document.getElementById('chat_history').innerHTML
+    };
+    storeCachedChatData(userChat);
 }
 
 /**

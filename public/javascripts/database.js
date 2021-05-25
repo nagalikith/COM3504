@@ -18,9 +18,9 @@ async function initDatabase(){
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME)) {
                     let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME,{
-                        keyPath:'id', autoIncrement: true
+                        keyPath:'room_id'
                     });
-                    userdataDB.createIndex('room_id', 'room_id')
+                    userdataDB.createIndex('room_id', 'room_id', {unique:true,multiEntry:true})
                 }
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME_2)) {
@@ -36,20 +36,23 @@ async function initDatabase(){
 window.initDatabase= initDatabase;
 
 
-async function storeCachedChatData(room_id, chatHistory) {
-    console.log('inserting: '+chatHistory);
+async function storeCachedChatData(userChat) {
+    console.log(JSON.stringify(userChat))
     if (!db)
         await initDatabase();
     if (db) {
         try{
             let tx = await db.transaction(USERCHAT_STORE_NAME, 'readwrite');
             let store = await tx.objectStore(USERCHAT_STORE_NAME);
-            await tx.store.add({
-                room_id: room_id.room_no,
-                chatHistory: chatHistory
-            });
+            let index = await store.index('room_id');
+            let request = await index.getAll(IDBKeyRange.only(userChat.room_id));
+            if (request.length > 0){
+                console.log("PATH HOPEFULLY: "+JSON.stringify(request))
+                store.put(userChat, request.room_id);
+            } else {
+                store.put(userChat);
+            }
             await  tx.done;
-            console.log('added item to the store! '+ JSON.stringify(chatHistory));
         } catch(error) {
             console.log(error)
         };
