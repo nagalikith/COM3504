@@ -59,7 +59,6 @@ function initCanvas(sckt, imageUrl) {
     chat.on('drawing', function(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness){
         let ctx = canvas[0].getContext('2d');
         console.log('X:' + x2 + '  Y:' + y2 + "color: " + color + " thinckness: " + thickness);
-        canvasData(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
         drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
     });
 
@@ -140,4 +139,9 @@ function drawOnCanvas(ctx, canvasWidth, canvasHeight, prevX, prevY, currX, currY
     ctx.lineWidth = thickness;
     ctx.stroke();
     ctx.closePath();
+    let room = document.getElementById('roomNo').value;
+    let imageUrl = document.getElementById('image_url').value;
+    canvasData(room+imageUrl, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness);
 }
+
+window.drawOnCanvas = drawOnCanvas;

@@ -11,10 +11,21 @@ function initUserChat() {
     }
 }
 
-function canvasData (room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness){
+async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness) {
+    var annotationsData = {
+        room_id: room,
+        canvasWidth: canvasWidth,
+        canvasHeight: canvasHeight,
+        x1: x1,
+        y1: y2,
+        x2: x2,
+        y2: y2,
+        color: color,
+        thickness: thickness
+    }
+    await storeCachedAnnotationsData(annotationsData).then();
 
 }
-
 
 
 /**
@@ -37,11 +48,31 @@ function sendAjaxQuery(url, data) {
             // we need to JSON.stringify the object
             let room_id = dataR.roomNo + dataR.image_url;
             var loadData = getCachedData(room_id).then(function (result){
-                loadData = result[0].chat;
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(loadData, 'text/html');
-                let history = document.getElementById('chat_history');
-                history.append(doc.body);
+                if (result){
+                    loadData = result[0].chat;
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(loadData, 'text/html');
+                    let history = document.getElementById('chat_history');
+                    history.append(doc.body);
+
+                }
+            });
+            var canvasArray = getCachedCanvasData(room_id).then(function (result){
+                if (result) {
+                    let cvx = document.getElementById('canvas');
+                    let ctx = cvx.getContext('2d');
+                    for (var i = 0; i < result.length; i++) {
+                        var obj = result[i];
+                        drawOnCanvas(ctx, obj.canvasWidth,
+                            obj.canvasHeight,
+                            obj.x1,
+                            obj.y1,
+                            obj.x2,
+                            obj.y2,
+                            obj.color,
+                            obj.thickness);
+                    }
+                }
             });
 
         },

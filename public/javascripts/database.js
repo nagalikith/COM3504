@@ -24,8 +24,10 @@ async function initDatabase(){
                 }
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME_2)) {
-                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME_2);
-                    userdataDB.createIndex('room_id', 'room_id')
+                    let userdataDB = upgradeDb.createObjectStore(USERCHAT_STORE_NAME_2, {
+                        keyPath:'id', autoIncrement:true
+                    });
+                    userdataDB.createIndex('room_id', 'room_id',{unique:false,multiEntry:true})
                 }
 
             }
@@ -90,3 +92,43 @@ async function getCachedData(room_id) {
     }
 }
 window.getCachedData= getCachedData;
+
+async function storeCachedAnnotationsData(annotationsData) {
+    if (!db)
+        await initDatabase();
+    if (db) {
+        try{
+            let tx = await db.transaction(USERCHAT_STORE_NAME_2, 'readwrite');
+            let store = await tx.objectStore(USERCHAT_STORE_NAME_2);
+            store.put(annotationsData);
+            await  tx.done;
+        } catch(error) {
+            console.log(error)
+        };
+    }
+}
+
+window.storeCachedAnnotationsData= storeCachedAnnotationsData;
+
+async function getCachedCanvasData(room_id) {
+    if (!db)
+        await initDatabase();
+    if (db) try {
+        console.log('fetching Chat History: ' + room_id);
+        let tx = await db.transaction(USERCHAT_STORE_NAME_2, 'readonly');
+        let store = await tx.objectStore(USERCHAT_STORE_NAME_2);
+        let index = await store.index('room_id');
+        let readingsList = await index.getAll(IDBKeyRange.only(room_id));
+        await tx.done;
+        if (readingsList && readingsList.length > 0) {
+            return readingsList;
+        } else {
+            console.log("Error Getting Data");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+window.getCachedCanvasData= getCachedCanvasData;
+
+
