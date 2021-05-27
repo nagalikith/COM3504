@@ -83,7 +83,7 @@ async function storeCachedAnnotationsData(annotationsData) {
         try{
             let tx = await db.transaction(USERCHAT_STORE_NAME_2, 'readwrite');
             let store = await tx.objectStore(USERCHAT_STORE_NAME_2);
-            store.put(annotationsData);
+            await store.put(annotationsData);
             await  tx.done;
         } catch(error) {
             console.log(error)

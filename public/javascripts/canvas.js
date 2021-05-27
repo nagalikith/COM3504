@@ -123,15 +123,15 @@ function drawImageScaled(img, canvas, ctx) {
  * @param color of the line
  * @param thickness of the line
  */
-function drawOnCanvas(ctx, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness) {
+async function drawOnCanvas(ctx, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness) {
     //get the ration between the current canvas and the one it has been used to draw on the other comuter
-    let ratioX= canvas.width/canvasWidth;
-    let ratioY= canvas.height/canvasHeight;
+    let ratioX = canvas.width / canvasWidth;
+    let ratioY = canvas.height / canvasHeight;
     // update the value of the points to draw
-    prevX*=ratioX;
-    prevY*=ratioY;
-    currX*=ratioX;
-    currY*=ratioY;
+    prevX *= ratioX;
+    prevY *= ratioY;
+    currX *= ratioX;
+    currY *= ratioY;
     ctx.beginPath();
     ctx.moveTo(prevX, prevY);
     ctx.lineTo(currX, currY);
@@ -141,7 +141,7 @@ function drawOnCanvas(ctx, canvasWidth, canvasHeight, prevX, prevY, currX, currY
     ctx.closePath();
     let room = document.getElementById('roomNo').value;
     let imageUrl = document.getElementById('image_url').value;
-    canvasData(room+imageUrl, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness);
+    await canvasData(room + imageUrl, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness);
 }
 
 window.drawOnCanvas = drawOnCanvas;
