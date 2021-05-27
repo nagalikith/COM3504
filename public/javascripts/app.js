@@ -1,5 +1,6 @@
 /**
  * called by the HTML onloadS
+ * Makes IndexDB database if it is no present
  */
 function initUserChat() {
     //check for support
@@ -11,6 +12,19 @@ function initUserChat() {
     }
 }
 
+/**
+ * Takes Annotation points and stores the data in the database
+ * @param room
+ * @param canvasWidth
+ * @param canvasHeight
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ * @param color
+ * @param thickness
+ * @returns {Promise<void>}
+ */
 async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness) {
     var annotationsData = {
         room_id: room,
@@ -29,11 +43,11 @@ async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color
 
 
 /**
- * it sends an Ajax query using JQuery
+ * it sends an Ajax query using JQuery and handing the Chat History and Canvas Drawings
  * @param url the url to send to
  * @param data the data to send (e.g. a Javascript structure)
  */
-function sendAjaxQuery(url, data) {
+function AjaxQueryRecieveData(url, data) {
     $.ajax({
         url: url ,
         data: JSON.stringify(data),
@@ -41,16 +55,13 @@ function sendAjaxQuery(url, data) {
         dataType: 'json',
         type: 'POST',
         success: function (dataR) {
-            // no need to JSON parse the result, as we are using
-            // dataType:json, so JQuery knows it and unpacks the
-            // object for us before returning it
-            // in order to have the object printed by alert
-            // we need to JSON.stringify the object
             let room_id = dataR.roomNo + dataR.image_url;
             var loadData = getCachedData(room_id).then(function (result){
                 if (result){
+                    //Get the Result from IndexDB and adds history to Chat History
                     loadData = result[0].chat;
                     var parser = new DOMParser();
+                    //Parsing String into HTML CODE
                     var doc = parser.parseFromString(loadData, 'text/html');
                     let history = document.getElementById('chat_history');
                     history.append(doc.body);
@@ -59,6 +70,7 @@ function sendAjaxQuery(url, data) {
             });
             var canvasArray = getCachedCanvasData(room_id).then(function (result){
                 if (result) {
+                    //Gets every element from the room id and iteratively draws on the canvas
                     let cvx = document.getElementById('canvas');
                     let ctx = cvx.getContext('2d');
                     for (var i = 0; i < result.length; i++) {
@@ -77,10 +89,6 @@ function sendAjaxQuery(url, data) {
 
         },
         error: function (response) {
-            // the error structure we passed is in the field responseText
-            // it is a string, even if we returned as JSON
-            // if you want o unpack it you must do:
-            // const dataR= JSON.parse(response.responseText)
             alert (response.responseText);
         }
     });
@@ -88,20 +96,18 @@ function sendAjaxQuery(url, data) {
 
 
 /**
- * called when the submit button is pressed
+ * called when the submit button is pressed in the user form
  * @param event the submission event
  */
 function onSubmit() {
     // The .serializeArray() method creates a JavaScript array of objects
-    // https://api.jquery.com/serializearray/
     const formArray= $("form").serializeArray();
     var data={};
     for (index in formArray){
         data[formArray[index].name]= formArray[index].value;
     }
     // const data = JSON.stringify($(this).serializeArray());
-    sendAjaxQuery('/', data);
-    // prevent the form from reloading the page (normal behaviour for forms)
+    AjaxQueryRecieveData('/getdata', data);
     event.preventDefault()
 }
 

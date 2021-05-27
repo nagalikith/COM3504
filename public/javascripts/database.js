@@ -10,6 +10,8 @@ const USERCHAT_STORE_NAME_2 = 'store_chatannotations';
 
 /**
  * it inits the database
+ * Creates 2 databases one fore Chat History
+ * Another for Past Annotations
  */
 async function initDatabase(){
     if (!db) {
@@ -37,7 +39,11 @@ async function initDatabase(){
 }
 window.initDatabase= initDatabase;
 
-
+/**
+ * This stores Chat History in IndexDB
+ * @param userChat
+ * @returns {Promise<void>}
+ */
 async function storeCachedChatData(userChat) {
     console.log(JSON.stringify(userChat))
     if (!db)
@@ -48,10 +54,12 @@ async function storeCachedChatData(userChat) {
             let store = await tx.objectStore(USERCHAT_STORE_NAME);
             let index = await store.index('room_id');
             let request = await index.getAll(IDBKeyRange.only(userChat.room_id));
+            //If Record is present it is updated
             if (request.length > 0){
                 console.log("PATH HOPEFULLY: "+JSON.stringify(request))
                 store.put(userChat, request.room_id);
             } else {
+            //New Record is made
                 store.put(userChat);
             }
             await  tx.done;
@@ -62,37 +70,12 @@ async function storeCachedChatData(userChat) {
 }
 window.storeCachedChatData= storeCachedChatData;
 
-
 /**
- * it retrieves the Chat data for a room_id from the database
- * @param room_id
- * @param date
- * @returns {*}
+ * It stores the canvas annotation data.
+ * Multiple records are stored in the indexDB
+ * @param annotationsData
+ * @returns {Promise<void>}
  */
-async function getCachedData(room_id) {
-    if (!db)
-        await initDatabase();
-    if (db) {
-        try {
-            console.log('fetching Chat History: ' + room_id);
-            let tx = await db.transaction(USERCHAT_STORE_NAME, 'readonly');
-            let store = await tx.objectStore(USERCHAT_STORE_NAME);
-            let index = await store.index('room_id');
-            let readingsList = await index.getAll(IDBKeyRange.only(room_id));
-            await tx.done;
-            let finalResults=[];
-            if (readingsList && readingsList.length > 0) {
-                return readingsList;
-            } else {
-                console.log("Error Getting Data");
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-}
-window.getCachedData= getCachedData;
-
 async function storeCachedAnnotationsData(annotationsData) {
     if (!db)
         await initDatabase();
@@ -110,6 +93,43 @@ async function storeCachedAnnotationsData(annotationsData) {
 
 window.storeCachedAnnotationsData= storeCachedAnnotationsData;
 
+/**
+ * it retrieves the Chat data for a room_id from the database
+ * @param room_id
+ * @param date
+ * @returns {Promise<*>}
+ */
+async function getCachedData(room_id) {
+    if (!db)
+        await initDatabase();
+    if (db) {
+        try {
+            console.log('fetching Chat History: ' + room_id);
+            let tx = await db.transaction(USERCHAT_STORE_NAME, 'readonly');
+            let store = await tx.objectStore(USERCHAT_STORE_NAME);
+            let index = await store.index('room_id');
+            //Gets only the specific room_id chat history
+            let readingsList = await index.getAll(IDBKeyRange.only(room_id));
+            await tx.done;
+            let finalResults=[];
+            if (readingsList && readingsList.length > 0) {
+                return readingsList;
+            } else {
+                console.log("Error Getting Data");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+window.getCachedData= getCachedData;
+
+
+/**
+ * it retrieves the Canvas Annotations data for a room_id from the database
+ * @param room_id
+ * @returns {Promise<*>}
+ */
 async function getCachedCanvasData(room_id) {
     if (!db)
         await initDatabase();

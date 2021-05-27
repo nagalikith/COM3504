@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "version": "1.0.0",
+    "title": "Image Browsing",
+    "description": "the solution",
+    "termsOfService": "http://api_url/terms/",
+    "contact": {
+      "name": "COM3504/6504",
+      "email": "@shef.ac.uk",
+      "url": "http://shef.ac.uk"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/",
+      "description": "the only Local server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "tags": [
+          "getting Data Stored in IndexDB"
+        ],
+        "description": "getting IndexDB data - currently it is gets Chat History and Past Annotations ",
+        "operationId": "user data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CityAndDate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct input of Child structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherForecast"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "no location provided",
+                  "internal_code": "missing_parameters"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+      "schemas": {
+        "Room No": {
+          "type": "string",
+          "description": "The room number",
+          "example": "R3350"
+        },
+        "Image Url": {
+          "type": "string",
+          "example": "https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg"
+        },
+        "Name": {
+                          "type": "string",
+                          "description": "User Name",
+                          "example": "Alex"
+                        },
+        "temperature": {
+                          "type": "integer",
+                          "description": "temperature in Celsiu degrees",
+                          "example": 14
+                        },
+        "wind": {
+                          "type": "integer",
+                          "description": "the wind force in nodes",
+                          "example": 15
+                        },
+        "precipitations": {
+                          "type": "integer",
+                          "description": "the precipitation probability",
+                          "example": 4
+                        },
+        "CityAndDate": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "$ref": "#/components/schemas/location"
+            },
+            "date": {
+              "$ref": "#/components/schemas/date"
+            }
+          }
+        },
+        "WeatherForecast": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "$ref": "#/components/schemas/location"
+            },
+            "forecast": {
+              "$ref": "#/components/schemas/forecast"
+            },
+            "temperature": {
+              "$ref": "#/components/schemas/temperature"
+            },
+            "wind": {
+                          "$ref": "#/components/schemas/wind"
+                        },
+            "precipitations": {
+                          "$ref": "#/components/schemas/precipitations"
+                        }
+          },
+          "example": "{location: London, date: 1616018089668,  forecast: 3,  temperature: -7,  wind: 4,  precipitations: 39}"
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "internal_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+}
