@@ -4,7 +4,7 @@
 function initUserChat() {
     //check for support
     if ('indexedDB' in window) {
-        initDatabase();
+        initDatabase().then();
     }
     else {
         console.log('This browser doesn\'t support IndexedDB');

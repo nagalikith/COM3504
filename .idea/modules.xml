@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/COM3504.iml" filepath="$PROJECT_DIR$/.idea/COM3504.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DatabaseServer/DatabaseServer.iml" filepath="$PROJECT_DIR$/DatabaseServer/DatabaseServer.iml" />
     </modules>
   </component>
 </project>

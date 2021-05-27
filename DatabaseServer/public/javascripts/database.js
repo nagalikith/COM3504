@@ -1,6 +1,6 @@
 ////////////////// DATABASE //////////////////
 // the database receives from the server the following structure
-import * as idb from './idb/index.js';
+import * as idb from './idb';
 
 let db;
 
