@@ -1,42 +1,20 @@
 let name = null;
 let roomNo = null;
-let chat= io.connect('/chat');
+let online = null;
+let chat = null;
 
+window.addEventListener(
+    "load",
+    function (e) {
+        if (navigator.onLine) {
+            online = true;
+        } else {
+            online = false;
+        }
+    },
+    false
+);
 
-// function initChatWorker() {
-//     if ('serviceWorker' in navigator) {
-//         navigator.serviceWorker
-//             .register('./service-worker.js')
-//             .then(function() { console.log('Service Worker Registered'); });
-//     }
-//     loadData(false);
-// }
-
-window.addEventListener('offline', function(e) {
-    // Queue up events for server.
-    console.log("You are offline");
-    showOfflineWarning();
-}, false);
-
-/**
- * When the client gets online, it hides the off line warning
- */
-window.addEventListener('online', function(e) {
-    // Resync data with server.
-    console.log("You are online");
-    hideOfflineWarning();
-    loadData(false);
-}, false);
-
-function showOfflineWarning(){
-    if (document.getElementById('offline_div')!=null)
-        document.getElementById('offline_div').style.display='block';
-}
-
-function hideOfflineWarning(){
-    if (document.getElementById('offline_div')!=null)
-        document.getElementById('offline_div').style.display='none';
-}
 
 /**
  * called by <body onload>
@@ -48,18 +26,28 @@ function init() {
     document.getElementById('initial_form').style.display = 'block';
     document.getElementById('chat_interface').style.display = 'none';
 
+    if (online){
+        chat = io.connect('/chat');
+    }
+    if (chat) {
+        initChatSocket();
+    }
 
-    initChatSocket();
+    //KG innit
+    KGInit();
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-            .register('./service-worker.js').then(
-                function() {
-                    console.log('Service Worker Registered');
-                },
-                function(err){
-                    console.log("Service Worker doesn't work", err);
-                });
+    //IndexDB
+    initUserChat();
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.js").then(
+            function () {
+                console.log("Service Worker Registered");
+            },
+            function (err) {
+                console.log("ServiceWorker registration failed", err);
+            }
+        );
     }
 }
 
@@ -103,7 +91,9 @@ function initChatSocket() {
  */
 function sendChatText() {
     let chatText = document.getElementById('chat_input').value;
-    chat.emit('chat', roomNo, name, chatText);
+    if (chat){
+        chat.emit('chat', roomNo, name, chatText);
+    }
 }
 
 /**
@@ -115,7 +105,9 @@ function connectToRoom() {
     name = document.getElementById('name').value;
     let imageUrl = document.getElementById('image_url').value;
     if (!name) name = 'Unknown-' + Math.random();
-    chat.emit('create or join', roomNo, name);
+    // only if online
+    if (chat)
+        chat.emit('create or join', roomNo, name);
     initCanvas('chat', imageUrl);
     hideLoginInterface(roomNo, name);
 }
@@ -152,4 +144,3 @@ function hideLoginInterface(room, userId) {
     document.getElementById('who_you_are').innerHTML= userId;
     document.getElementById('in_room').innerHTML= ' '+room;
 }
-

@@ -8,10 +8,14 @@
     <script src="/javascripts/index.js"></script>
     <script src="/javascripts/canvas.js"></script>
     <script src="/javascripts/app.js"></script>
+    <script src="/javascripts/KG.js"></script>
     <script src="/javascripts/database.js" type="module"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
-<body onload="init(); initUserChat();">
+<body onload="init();">
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
@@ -40,12 +44,18 @@
     <div>
         <p><div id="who_you_are" style="display: inline" style="height: 10vh"></div>, you are in ROOM: <div id="in_room" style="display: inline"></div>
     </div>
-    </p>
-    <div style="width: 100%; height: 50vh">
-        <img id="image" height="100%" >
-        <canvas id="canvas" ></canvas>
     </div>
-
+    <div>
+        <div>
+            <h1>Search the Knowledge Graph</h1>
+            <label for="myInput">Type: </label><input type="text" id="myInput">
+            <button id="KGButton">Click to Start</button>
+        </div>
+        <div style="width: 100%; height: 50vh">
+            <img id="image" height="100%" >
+            <canvas id="canvas" ></canvas>
+        </div>
+    </div>
     <div id="history" style="height: 35vh" class="boxed scrolling" ></div>
     <div id="input" style="height: 5vh" class=" boxed">
 
