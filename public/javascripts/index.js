@@ -3,18 +3,14 @@ let roomNo = null;
 let chat= io.connect('/chat');
 
 
-function initChatWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-            .register('./service-worker.js')
-            .then(function() { console.log('Service Worker Registered'); });
-    }
-    loadData(false);
-}
-
-function loadData(forceReload){
-    forceReload = true;
-}
+// function initChatWorker() {
+//     if ('serviceWorker' in navigator) {
+//         navigator.serviceWorker
+//             .register('./service-worker.js')
+//             .then(function() { console.log('Service Worker Registered'); });
+//     }
+//     loadData(false);
+// }
 
 window.addEventListener('offline', function(e) {
     // Queue up events for server.
@@ -52,8 +48,19 @@ function init() {
     document.getElementById('initial_form').style.display = 'block';
     document.getElementById('chat_interface').style.display = 'none';
 
-    //@todo here is where you should initialise the socket operations as described in teh lectures (room joining, chat message receipt etc.)
+
     initChatSocket();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('./service-worker.js').then(
+                function() {
+                    console.log('Service Worker Registered');
+                },
+                function(err){
+                    console.log("Service Worker doesn't work", err);
+                });
+    }
 }
 
 /**
