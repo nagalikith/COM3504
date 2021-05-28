@@ -7,20 +7,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/javascripts/index.js"></script>
     <script src="/javascripts/canvas.js"></script>
+    <script src="/javascripts/app.js"></script>
+    <script src="/javascripts/database.js" type="module"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
-<body onload="init()">
+<body onload="init(); initUserChat();">
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
         <a class="navbar-brand" href=".">
             <img href="." src="/images/spylogo.png" width="414" height="66" alt="Spy Logo">
         </a>
+    </div>
 </nav>
 <div id="initial_form" style="display: block">
     <h1><%= title %></h1>
     <p>Please insert the id of the Room you want to Join, if you do not have a room id, click Generate Room</p>
-    <form onsubmit="return false;">
+    <form onsubmit="onSubmit()">
         <p><label for="name"> Your name </label>
             <input type="text" id="name" name="name">
         </p>
@@ -31,7 +34,7 @@
         </p>
         <p style=" width: 100%"><label for="image_url"> Image (URL) </label><input type="text" id="image_url" name="image_url"></p>
         <button id="connect" onclick="connectToRoom()">Connect</button>
-    </form>
+    </form >
 </div>
 <div id="chat_interface" style="display: none">
     <div>

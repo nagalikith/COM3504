@@ -1,0 +1,245 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "version": "1.0.0",
+    "title": "Image Browsing",
+    "description": "the solution",
+    "termsOfService": "http://api_url/terms/",
+    "contact": {
+      "name": "COM3504/6504",
+      "email": "@shef.ac.uk",
+      "url": "http://shef.ac.uk"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/",
+      "description": "the only Local server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Welcome/ Login Page"
+        ],
+        "description": "Allows User to Login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserChat"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Correct input of User Data"
+          },
+          "401": {
+            "description": "Missing parameters"
+          }
+        }
+      }
+    },
+    "/getdata": {
+      "post": {
+        "tags": [
+          "Getting Data Stored in IndexDB"
+        ],
+        "description": "getting IndexDB data - currently it is gets Chat History and Past Annotations ",
+        "operationId": "user data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserChat"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct input of Child structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatObject"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Correct input of Child structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanvasAnnotations"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "no location provided",
+                  "internal_code": "missing_parameters"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+      "schemas": {
+        "RoomNo": {
+          "type": "string",
+          "description": "The room number",
+          "example": "R3350"
+        },
+        "image_url": {
+          "type": "string",
+          "example": "https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg"
+        },
+        "Name": {
+                          "type": "string",
+                          "description": "User Name",
+                          "example": "Alex"
+                        },
+        "UserChat": {
+          "type": "object",
+          "properties": {
+            "roomNo": {
+              "$ref": "#/components/schemas/RoomNo"
+            },
+            "image_url": {
+              "$ref": "#/components/schemas/image_url"
+            }
+          },
+          "example": "{roomNo: R3, image_url: https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg }"
+        },
+        "room_id": {
+                          "type": "string",
+                          "description": "Unique Key of each room",
+                          "example": "12https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg"
+                        },
+        "chat": {
+                          "type": "string",
+                          "description": "Previous Stored Chat in HTML FORMAT",
+                          "example": "<p><b>Me:</b> Hello</p>"
+                        },
+        "ChatObject": {
+                          "type": "object",
+                          "description": "the precipitation probability",
+                          "properties": {
+                            "room_id": {
+                              "$ref": "#/components/schemas/room_id"
+                            },
+                            "chat": {
+                              "$ref": "#/components/schemas/chat"
+                            }
+                          },
+                          "example": "{room_id: 12https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg, chat: <p><b>Me:</b> Hello</p>}"
+                        },
+        "canvasWidth": {
+          "type": "integer",
+          "description": "Canvas Width",
+          "example": 362
+        },
+        "canvasHeight": {
+          "type": "integer",
+          "description": "Canvas Height",
+          "example": 550
+        },
+        "x1": {
+          "type": "integer",
+          "description": "Point on Canvas",
+          "example": 200
+        },
+        "y1": {
+          "type": "integer",
+          "description": "Point on Canvas",
+          "example": 86
+        },
+        "x2": {
+          "type": "integer",
+          "description": "Point on Canvas",
+          "example": 200
+        },
+        "y2": {
+          "type": "integer",
+          "description": "Point on Canvas",
+          "example": 86
+        },
+        "color": {
+          "type": "string",
+          "description": "Color of Paint",
+          "example": "red"
+        },
+        "thickness": {
+          "type": "integer",
+          "description": "thickness",
+          "example": 4
+        },
+        "CanvasAnnotations": {
+          "type": "object",
+          "properties": {
+            "room_id": {
+              "$ref": "#/components/schemas/room_id"
+            },
+            "canvasWidth": {
+              "$ref": "#/components/schemas/canvasWidth"
+            },
+            "canvasHeight": {
+              "$ref": "#/components/schemas/canvasHeight"
+            },
+            "x1": {
+                          "$ref": "#/components/schemas/x1"
+                        },
+            "y1": {
+                          "$ref": "#/components/schemas/y1"
+                        },
+            "x2": {
+              "$ref": "#/components/schemas/x2"
+            },
+            "y2": {
+              "$ref": "#/components/schemas/y2"
+            },
+            "color": {
+              "$ref": "#/components/schemas/color"
+            },
+            "thick": {
+              "$ref": "#/components/schemas/thickness"
+            }
+          },
+          "example": "{room_id: 12https://photographycourse.net/wp-content/uploads/2014/11/Landscape-Photography-steps.jpg, canvasWidth: 362,  canvasHeight: 500,  x1: 200,  y1: 87,  x2: 200, y2: 87, color: red, thickness: 4}"
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "internal_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+}

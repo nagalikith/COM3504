@@ -89,17 +89,12 @@ function initChatSocket() {
         let who = userId
         if (userId === name) who = 'Me';
         writeOnChatHistory('<b>' + who + ':</b> ' + chatText);
+
+
     });
 
 }
 
-function writeOnChatHistory(text) {
-    let history = document.getElementById('chat_history');
-    let paragraph = document.createElement('p');
-    paragraph.innerHTML = text;
-    history.appendChild(paragraph);
-    document.getElementById('chat_input').value = '';
-}
 
 
 /**
@@ -138,6 +133,12 @@ function writeOnChatHistory(text) {
     history.appendChild(paragraph);
     history.scrollTop = history.scrollHeight;
     document.getElementById('chat_input').value = '';
+    document.getElementById('chat_input').value = '';
+    let userChat = {room_id: document.getElementById('roomNo').value +
+            document.getElementById('image_url').value,
+        chat: document.getElementById('chat_history').innerHTML
+    };
+    storeCachedChatData(userChat);
 }
 
 /**
