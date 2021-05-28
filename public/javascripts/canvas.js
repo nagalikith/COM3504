@@ -39,7 +39,9 @@ function initCanvas(sckt, imageUrl) {
             if (flag) {
                 drawOnCanvas(ctx, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness);
                 // emiting what you are drawing on your own canvas
-                chat.emit('draw', room, userId, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness)
+                if (chat) {
+                    chat.emit('draw', room, userId, canvas.width, canvas.height, prevX, prevY, currX, currY, color, thickness)
+                }
             }
         }
     });
@@ -56,11 +58,13 @@ function initCanvas(sckt, imageUrl) {
     /**
      someoneelse is broadcasting that they are drawing on their canvas
      */
-    chat.on('drawing', function(room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness){
-        let ctx = canvas[0].getContext('2d');
-        console.log('X:' + x2 + '  Y:' + y2 + "color: " + color + " thinckness: " + thickness);
-        drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
-    });
+    if(chat) {
+        chat.on('drawing', function (room, userId, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness) {
+            let ctx = canvas[0].getContext('2d');
+            console.log('X:' + x2 + '  Y:' + y2 + "color: " + color + " thinckness: " + thickness);
+            drawOnCanvas(ctx, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness);
+        });
+    }
 
     // this is called when the src of the image is loaded
     // this is an async operation as it may take time

@@ -1,6 +1,19 @@
 let name = null;
 let roomNo = null;
-let chat= io.connect('/chat');
+let online = null;
+let chat = null;
+
+window.addEventListener(
+    "load",
+    function (e) {
+        if (navigator.onLine) {
+            online = true;
+        } else {
+            online = false;
+        }
+    },
+    false
+);
 
 
 /**
@@ -13,8 +26,23 @@ function init() {
     document.getElementById('initial_form').style.display = 'block';
     document.getElementById('chat_interface').style.display = 'none';
 
-    //@todo here is where you should initialise the socket operations as described in teh lectures (room joining, chat message receipt etc.)
-    initChatSocket();
+    if (online){
+        chat = io.connect('/chat');
+    }
+    if (chat) {
+        initChatSocket();
+    }
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.js").then(
+            function () {
+                console.log("Service Worker Registered");
+            },
+            function (err) {
+                console.log("ServiceWorker registration failed", err);
+            }
+        );
+    }
 }
 
 /**
@@ -57,7 +85,9 @@ function initChatSocket() {
  */
 function sendChatText() {
     let chatText = document.getElementById('chat_input').value;
-    chat.emit('chat', roomNo, name, chatText);
+    if (chat){
+        chat.emit('chat', roomNo, name, chatText);
+    }
 }
 
 /**
@@ -69,7 +99,9 @@ function connectToRoom() {
     name = document.getElementById('name').value;
     let imageUrl = document.getElementById('image_url').value;
     if (!name) name = 'Unknown-' + Math.random();
-    chat.emit('create or join', roomNo, name);
+    // only if online
+    if (chat)
+        chat.emit('create or join', roomNo, name);
     initCanvas('chat', imageUrl);
     hideLoginInterface(roomNo, name);
 }

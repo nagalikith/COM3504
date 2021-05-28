@@ -89,8 +89,12 @@ function AjaxQueryRecieveData(url, data) {
 
         },
         error: function (response) {
+            let room_id = data.roomNo + data.image_url;
+            console.log("Data " + room_id)
+
             alert (response.responseText);
         }
+
     });
 }
 
@@ -107,7 +111,12 @@ function onSubmit() {
         data[formArray[index].name]= formArray[index].value;
     }
     // const data = JSON.stringify($(this).serializeArray());
+
     AjaxQueryRecieveData('/getdata', data);
-    event.preventDefault()
+    event.preventDefault();
+
+
+
+
 }
 
