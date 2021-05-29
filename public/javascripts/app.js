@@ -23,9 +23,10 @@ function initUserChat() {
  * @param y2
  * @param color
  * @param thickness
+ * @param KG_annotationText
  * @returns {Promise<void>}
  */
-async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness) {
+async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color, thickness,KG_annotationText) {
     var annotationsData = {
         room_id: room,
         canvasWidth: canvasWidth,
@@ -35,7 +36,8 @@ async function canvasData(room, canvasWidth, canvasHeight, x1, y1, x2, y2, color
         x2: x2,
         y2: y2,
         color: color,
-        thickness: thickness
+        thickness: thickness,
+        KG: KG_annotationText
     }
     await storeCachedAnnotationsData(annotationsData).then();
 

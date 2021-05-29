@@ -145,7 +145,7 @@ async function drawOnCanvas(ctx, canvasWidth, canvasHeight, prevX, prevY, currX,
     ctx.closePath();
     let room = document.getElementById('roomNo').value;
     let imageUrl = document.getElementById('image_url').value;
-    await canvasData(room + imageUrl, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness);
+    await canvasData(room + imageUrl, canvasWidth, canvasHeight, prevX, prevY, currX, currY, color, thickness,KG_annotationText);
 }
 
 window.drawOnCanvas = drawOnCanvas;

@@ -10,6 +10,7 @@ var filesToCache = [
     '/stylesheets/style.css',
     '/javascripts/idb/index.js',
     "/javascripts/app.js",
+    "/javascripts/KG.js",
     '/javascripts/idb/wrap-idb-value.js',
 ];
 
