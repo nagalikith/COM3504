@@ -51,7 +51,7 @@ self.addEventListener("activate", function (e) {
  */
 self.addEventListener("fetch", function (e) {
     console.log("[Service Worker] Fetch", e.request.url);
-    if (e.request.url.indexOf("localhost") === -1 || e.request.url.indexOf("chat.io") > -1) {
+    if (e.request.url.indexOf("localhost") === -1 || e.request.url.indexOf("socket.io") > -1) {
         console.log("External request");
         e.respondWith(fetch(e.request));
     } else {

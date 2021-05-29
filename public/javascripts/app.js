@@ -90,8 +90,37 @@ function AjaxQueryRecieveData(url, data) {
         },
         error: function (response) {
             let room_id = data.roomNo + data.image_url;
-            console.log("Data " + room_id)
+            console.log("Data " + room_id);
+            var loadData = getCachedData(room_id).then(function (result){
+                if (result){
+                    //Get the Result from IndexDB and adds history to Chat History
+                    loadData = result[0].chat;
+                    var parser = new DOMParser();
+                    //Parsing String into HTML CODE
+                    var doc = parser.parseFromString(loadData, 'text/html');
+                    let history = document.getElementById('chat_history');
+                    history.append(doc.body);
 
+                }
+            });
+            var canvasArray = getCachedCanvasData(room_id).then(function (result){
+                if (result) {
+                    //Gets every element from the room id and iteratively draws on the canvas
+                    let cvx = document.getElementById('canvas');
+                    let ctx = cvx.getContext('2d');
+                    for (var i = 0; i < result.length; i++) {
+                        var obj = result[i];
+                        drawOnCanvas(ctx, obj.canvasWidth,
+                            obj.canvasHeight,
+                            obj.x1,
+                            obj.y1,
+                            obj.x2,
+                            obj.y2,
+                            obj.color,
+                            obj.thickness);
+                    }
+                }
+            });
             alert (response.responseText);
         }
 

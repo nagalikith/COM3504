@@ -1,88 +1,162 @@
-import { w as wrap, r as replaceTraps } from "./wrap-idb-value.js?module";
-export { u as unwrap, w as wrap } from "./wrap-idb-value.js?module";
-
 /**
- * Open a database.
- *
- * @param name Name of the database.
- * @param version Schema version.
- * @param callbacks Additional callbacks.
+ * This code was copied from one of the lab classes exercise
  */
-function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
-    const request = indexedDB.open(name, version);
-    const openPromise = wrap(request);
-    if (upgrade) {
-        request.addEventListener('upgradeneeded', event => {
-            upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction));
-        });
-    }
-    if (blocked)
-        request.addEventListener('blocked', () => blocked());
-    openPromise.
-    then(db => {
-        if (terminated)
-            db.addEventListener('close', () => terminated());
-        if (blocking)
-            db.addEventListener('versionchange', () => blocking());
-    }).
-    catch(() => {});
-    return openPromise;
-}
-/**
- * Delete a database.
- *
- * @param name Name of the database.
- */
-function deleteDB(name, { blocked } = {}) {
-    const request = indexedDB.deleteDatabase(name);
-    if (blocked)
-        request.addEventListener('blocked', () => blocked());
-    return wrap(request).then(() => undefined);
-}
-
-const readMethods = ['get', 'getKey', 'getAll', 'getAllKeys', 'count'];
-const writeMethods = ['put', 'add', 'delete', 'clear'];
-const cachedMethods = new Map();
-function getMethod(target, prop) {
-    if (!(target instanceof IDBDatabase &&
-        !(prop in target) &&
-        typeof prop === 'string')) {
-        return;
-    }
-    if (cachedMethods.get(prop))
-        return cachedMethods.get(prop);
-    const targetFuncName = prop.replace(/FromIndex$/, '');
-    const useIndex = prop !== targetFuncName;
-    const isWrite = writeMethods.includes(targetFuncName);
-    if (
-        // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
-        !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) ||
-        !(isWrite || readMethods.includes(targetFuncName))) {
-        return;
-    }
-    const method = async function (storeName, ...args) {
-        // isWrite ? 'readwrite' : undefined gzipps better, but fails in Edge :(
-        const tx = this.transaction(storeName, isWrite ? 'readwrite' : 'readonly');
-        let target = tx.store;
-        if (useIndex)
-            target = target.index(args.shift());
-        // Must reject if op rejects.
-        // If it's a write operation, must reject if tx.done rejects.
-        // Must reject with op rejection first.
-        // Must resolve with op value.
-        // Must handle both promises (no unhandled rejections)
-        return (await Promise.all([
-            target[targetFuncName](...args),
-            isWrite && tx.done]))[
-            0];
+var idb = (function (e) {
+    "use strict";
+    let t, n;
+    const r = new WeakMap(),
+        o = new WeakMap(),
+        s = new WeakMap(),
+        a = new WeakMap(),
+        i = new WeakMap();
+    let c = {
+        get(e, t, n) {
+            if (e instanceof IDBTransaction) {
+                if ("done" === t) return o.get(e);
+                if ("objectStoreNames" === t) return e.objectStoreNames || s.get(e);
+                if ("store" === t) return n.objectStoreNames[1] ? void 0 : n.objectStore(n.objectStoreNames[0]);
+            }
+            return p(e[t]);
+        },
+        set: (e, t, n) => ((e[t] = n), !0),
+        has: (e, t) => (e instanceof IDBTransaction && ("done" === t || "store" === t)) || t in e,
     };
-    cachedMethods.set(prop, method);
-    return method;
-}
-replaceTraps(oldTraps => ({
-    ...oldTraps,
-    get: (target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver),
-    has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop) }));
 
+    function u(e) {
+        return e !== IDBDatabase.prototype.transaction || "objectStoreNames" in IDBTransaction.prototype
+            ? (
+                n ||
+                (n = [
+                    IDBCursor.prototype.advance,
+                    IDBCursor.prototype.continue,
+                    IDBCursor.prototype.continuePrimaryKey,
+                ])
+            ).includes(e)
+                ? function (...t) {
+                    return e.apply(f(this), t), p(r.get(this));
+                }
+                : function (...t) {
+                    return p(e.apply(f(this), t));
+                }
+            : function (t, ...n) {
+                const r = e.call(f(this), t, ...n);
+                return s.set(r, t.sort ? t.sort() : [t]), p(r);
+            };
+    }
 
-export { deleteDB, openDB };
+    function d(e) {
+        return "function" == typeof e
+            ? u(e)
+            : (e instanceof IDBTransaction &&
+            (function (e) {
+                if (o.has(e)) return;
+                const t = new Promise((t, n) => {
+                    const r = () => {
+                            e.removeEventListener("complete", o),
+                                e.removeEventListener("error", s),
+                                e.removeEventListener("abort", s);
+                        },
+                        o = () => {
+                            t(), r();
+                        },
+                        s = () => {
+                            n(e.error || new DOMException("AbortError", "AbortError")), r();
+                        };
+                    e.addEventListener("complete", o),
+                        e.addEventListener("error", s),
+                        e.addEventListener("abort", s);
+                });
+                o.set(e, t);
+            })(e),
+                (n = e),
+                (t || (t = [IDBDatabase, IDBObjectStore, IDBIndex, IDBCursor, IDBTransaction])).some(
+                    (e) => n instanceof e
+                )
+                    ? new Proxy(e, c)
+                    : e);
+        var n;
+    }
+
+    function p(e) {
+        if (e instanceof IDBRequest)
+            return (function (e) {
+                const t = new Promise((t, n) => {
+                    const r = () => {
+                            e.removeEventListener("success", o), e.removeEventListener("error", s);
+                        },
+                        o = () => {
+                            t(p(e.result)), r();
+                        },
+                        s = () => {
+                            n(e.error), r();
+                        };
+                    e.addEventListener("success", o), e.addEventListener("error", s);
+                });
+                return (
+                    t
+                        .then((t) => {
+                            t instanceof IDBCursor && r.set(t, e);
+                        })
+                        .catch(() => {}),
+                        i.set(t, e),
+                        t
+                );
+            })(e);
+        if (a.has(e)) return a.get(e);
+        const t = d(e);
+        return t !== e && (a.set(e, t), i.set(t, e)), t;
+    }
+
+    const f = (e) => i.get(e);
+    const l = ["get", "getKey", "getAll", "getAllKeys", "count"],
+        D = ["put", "add", "delete", "clear"],
+        v = new Map();
+
+    function b(e, t) {
+        if (!(e instanceof IDBDatabase) || t in e || "string" != typeof t) return;
+        if (v.get(t)) return v.get(t);
+        const n = t.replace(/FromIndex$/, ""),
+            r = t !== n,
+            o = D.includes(n);
+        if (!(n in (r ? IDBIndex : IDBObjectStore).prototype) || (!o && !l.includes(n))) return;
+        const s = async function (e, ...t) {
+            const s = this.transaction(e, o ? "readwrite" : "readonly");
+            let a = s.store;
+            return r && (a = a.index(t.shift())), (await Promise.all([a[n](...t), o && s.done]))[0];
+        };
+        return v.set(t, s), s;
+    }
+
+    return (
+        (c = ((e) => ({
+            ...e,
+            get: (t, n, r) => b(t, n) || e.get(t, n, r),
+            has: (t, n) => !!b(t, n) || e.has(t, n),
+        }))(c)),
+            (e.deleteDB = function (e, { blocked: t } = {}) {
+                const n = indexedDB.deleteDatabase(e);
+                return t && n.addEventListener("blocked", () => t()), p(n).then(() => {});
+            }),
+            (e.openDB = function (e, t, { blocked: n, upgrade: r, blocking: o, terminated: s } = {}) {
+                const a = indexedDB.open(e, t),
+                    i = p(a);
+                return (
+                    r &&
+                    a.addEventListener("upgradeneeded", (e) => {
+                        r(p(a.result), e.oldVersion, e.newVersion, p(a.transaction));
+                    }),
+                    n && a.addEventListener("blocked", () => n()),
+                        i
+                            .then((e) => {
+                                s && e.addEventListener("close", () => s()),
+                                o && e.addEventListener("versionchange", () => o());
+                            })
+                            .catch(() => {}),
+                        i
+                );
+            }),
+            (e.unwrap = f),
+            (e.wrap = p),
+            e
+    );
+})({});

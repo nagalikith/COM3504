@@ -1,8 +1,7 @@
 ////////////////// DATABASE //////////////////
 // the database receives from the server the following structure
-import * as idb from './idb/index.js';
 
-let db;
+let database;
 
 const USERCHAT_DB_NAME= 'db_UserChat_1';
 const USERCHAT_STORE_NAME= 'store_userchats';
@@ -14,8 +13,8 @@ const USERCHAT_STORE_NAME_2 = 'store_chatannotations';
  * Another for Past Annotations
  */
 async function initDatabase(){
-    if (!db) {
-        db = await idb.openDB(USERCHAT_DB_NAME, 2, {
+    if (!database) {
+        database = await idb.openDB(USERCHAT_DB_NAME, 2, {
             upgrade: function (upgradeDb, oldVersion, newVersion) {
 
                 if (!upgradeDb.objectStoreNames.contains(USERCHAT_STORE_NAME)) {
@@ -46,11 +45,11 @@ window.initDatabase= initDatabase;
  */
 async function storeCachedChatData(userChat) {
     console.log(JSON.stringify(userChat))
-    if (!db)
+    if (!database)
         await initDatabase();
-    if (db) {
+    if (database) {
         try{
-            let tx = await db.transaction(USERCHAT_STORE_NAME, 'readwrite');
+            let tx = await database.transaction(USERCHAT_STORE_NAME, 'readwrite');
             let store = await tx.objectStore(USERCHAT_STORE_NAME);
             let index = await store.index('room_id');
             let request = await index.getAll(IDBKeyRange.only(userChat.room_id));
@@ -77,11 +76,11 @@ window.storeCachedChatData= storeCachedChatData;
  * @returns {Promise<void>}
  */
 async function storeCachedAnnotationsData(annotationsData) {
-    if (!db)
+    if (!database)
         await initDatabase();
-    if (db) {
+    if (database) {
         try{
-            let tx = await db.transaction(USERCHAT_STORE_NAME_2, 'readwrite');
+            let tx = await database.transaction(USERCHAT_STORE_NAME_2, 'readwrite');
             let store = await tx.objectStore(USERCHAT_STORE_NAME_2);
             await store.put(annotationsData);
             await  tx.done;
@@ -100,12 +99,12 @@ window.storeCachedAnnotationsData= storeCachedAnnotationsData;
  * @returns {Promise<*>}
  */
 async function getCachedData(room_id) {
-    if (!db)
+    if (!database)
         await initDatabase();
-    if (db) {
+    if (database) {
         try {
             console.log('fetching Chat History: ' + room_id);
-            let tx = await db.transaction(USERCHAT_STORE_NAME, 'readonly');
+            let tx = await database.transaction(USERCHAT_STORE_NAME, 'readonly');
             let store = await tx.objectStore(USERCHAT_STORE_NAME);
             let index = await store.index('room_id');
             //Gets only the specific room_id chat history
@@ -131,11 +130,11 @@ window.getCachedData= getCachedData;
  * @returns {Promise<*>}
  */
 async function getCachedCanvasData(room_id) {
-    if (!db)
+    if (!database)
         await initDatabase();
-    if (db) try {
+    if (database) try {
         console.log('fetching Chat History: ' + room_id);
-        let tx = await db.transaction(USERCHAT_STORE_NAME_2, 'readonly');
+        let tx = await database.transaction(USERCHAT_STORE_NAME_2, 'readonly');
         let store = await tx.objectStore(USERCHAT_STORE_NAME_2);
         let index = await store.index('room_id');
         let readingsList = await index.getAll(IDBKeyRange.only(room_id));
