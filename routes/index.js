@@ -8,11 +8,24 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/getdata', function (req,res) {
+  if (req.body == null) {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(403).json({error: 403, reason: 'no user data provided'});
+  }
+   else if (!req.body.image_url) {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(403).json({error: 403, reason: 'Image URL is invalid'});
+  } else if (!req.body.roomNo) {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(403).json({error: 403, reason: 'Room Number is invalid'});
+  }
   let roomNo = req.body.roomNo;
   let image_url = req.body.image_url;
   let userData = getUserData(roomNo,image_url);
   console.log("Room ID" + userData);
-  res.end(JSON.stringify(userData));
+  res.setHeader('Content-Type', 'application/json');
+  res.json(userData);
+
 });
 
 module.exports = router;

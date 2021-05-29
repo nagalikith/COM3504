@@ -75,22 +75,25 @@ function displayKG() {
             //creates the table
             let tableData = `
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Reference concept</th>
-                    <th>Link</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Reference concept</th>
+                    <th scope="col">Link</th>
                 </tr>
             `;
             console.log("FINAL LENGTH " +annotationsFinal.length);
+            let  i = 1;
             for (const canvasdata of annotationsFinal) {
                 tableData += `
                     <tr>
+                        <th scope="row"> i </th>
                         <td>${canvasdata.KG.name + "-"}</td>
                         <td>${canvasdata.KG.description + "-"}</td>
                         <td>${canvasdata.KG.rc + "-"}</td>
                         <td><a href="${canvasdata.KG.qc + "-"}">Direct link</a></td>
                     </tr>
                 `;
+                i++;
             }
             document.getElementById("KG_table").innerHTML = tableData;
         }

@@ -123,7 +123,6 @@ function AjaxQueryRecieveData(url, data) {
                     }
                 }
             });
-            alert (response.responseText);
         }
 
     });
